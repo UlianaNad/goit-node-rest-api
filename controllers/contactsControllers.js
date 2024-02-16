@@ -22,11 +22,12 @@ export const getAllContacts = async (req, res, next) => {
 export const getOneContact = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const contact = await getContactById(id);
+
+    const result = await getContactById(id);
     if (!result) {
       throw HttpError(404, `Contact with id=${id} was not found`);
     }
-    res.json(contact);
+    res.json(result);
   } catch (error) {
     next(error);
   }
@@ -35,7 +36,7 @@ export const getOneContact = async (req, res, next) => {
 export const deleteContact = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await updateContactById(id, req.body);
+    const result = await removeContact(id);
     if (!result) {
       throw HttpError(404, `Contact with id=${id} was not found`);
     }
