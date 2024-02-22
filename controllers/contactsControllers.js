@@ -83,24 +83,6 @@ export const updateContact = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-
-  // try {
-  //   const { id } = req.params;
-  //   const { error } = updateContactSchema.validate(req.body);
-  //   if (error) throw HttpError(400, error.message);
-
-  //   if (Object.keys(req.body).length === 0) {
-  //     throw HttpError(400, "Body must have at least one field");
-  //   }
-  //   const result = await contactsService.updateContact(id, req.body);
-  //   if (!result) {
-  //     throw HttpError(404);
-  //   }
-
-  //   return res.json(result);
-  // } catch (error) {
-  //   next(error);
-  // }
 };
 
 export const updateStatusOfContact = async (req, res, next) => {
@@ -121,25 +103,4 @@ export const updateStatusOfContact = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-
-  // try {
-  //   const { id } = req.params;
-  //   const { error } = updateContactSchema.validate(req.body);
-
-  //   if (Object.keys(req.body).length === 0) {
-  //     throw HttpError(400, "Body must have at least one field");
-  //   }
-
-  //   if (error) {
-  //     throw HttpError(400, error.message);
-  //   }
-
-  //   const result = await contactsService.updateStatus(id, req.body);
-  //   if (!result) {
-  //     throw HttpError(404);
-  //   }
-  //   return res.json(result);
-  // } catch (error) {
-  //   next(error);
-  // }
 };

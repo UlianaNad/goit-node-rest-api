@@ -7,12 +7,7 @@ import {
   updateContact,
   updateStatusOfContact,
 } from "../controllers/contactsControllers.js";
-import validateBody from "../helpers/validateBody.js";
-import {
-  createContactSchema,
-  updateContactSchema,
-  updateContactStatusSchema,
-} from "../schemas/contactsSchemas.js";
+
 import isValidId from "../middlewares/isValidId.js";
 
 const contactsRouter = express.Router();
