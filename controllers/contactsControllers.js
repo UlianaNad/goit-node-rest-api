@@ -6,7 +6,7 @@ import {
   removeContact,
   updateStatusContact,
 } from "../services/contactsServices.js";
-import HttpError from "../helpers/HttpError.js";
+
 import {
   createContactSchema,
   updateContactSchema,
