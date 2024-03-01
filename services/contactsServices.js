@@ -5,6 +5,9 @@ export const listContacts = () => Contact.find({}, "-createdAt -updatedAt");
 export const getContactsListFilter = (filter, query = {}) =>
   Contact.find(filter, "-createdAt -updatedAt", query);
 
+export const getAllUserContactsByFilter = (filter) =>
+  Contact.countDocuments(filter);
+
 export const getContactById = (contactId) => Contact.findById(contactId);
 
 export const getContactByFilter = (filter) => Contact.findOne(filter);

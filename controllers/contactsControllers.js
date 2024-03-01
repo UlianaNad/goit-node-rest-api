@@ -10,6 +10,7 @@ import {
   removeContactByFilter,
   updateStatusContact,
   updateStatusContactByFilter,
+  getAllUserContactsByFilter,
 } from "../services/contactsServices.js";
 
 import {
@@ -24,7 +25,8 @@ export const getAllContacts = async (req, res, next) => {
   const skip = (page - 1) * limit;
   try {
     const result = await getContactsListFilter({ owner }, { skip, limit });
-    res.json(result);
+    const total = await getAllUserContactsByFilter({ owner });
+    res.json({ total, result });
   } catch (error) {
     next(error);
   }
