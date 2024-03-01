@@ -20,6 +20,15 @@ const userSchema = new Schema(
       required: true,
       minlength: 6,
     },
+    token: {
+      type: String,
+      default: null,
+    },
+    subscription: {
+      type: String,
+      enum: ["starter", "pro", "business"],
+      default: "starter",
+    },
   },
   { versionKey: false, timestamps: true }
 );

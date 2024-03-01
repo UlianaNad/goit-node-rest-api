@@ -5,6 +5,7 @@ import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import { updateSubscriptionSchema } from "../schemas/userSchema.js";
 
 const { JWT_SECRET } = process.env;
 
@@ -39,6 +40,8 @@ const signin = async (req, res) => {
     id: user._id,
   };
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "23h" });
+  await authServices.setToken(user._id, token);
+
   res.json({
     token,
   });
@@ -52,8 +55,46 @@ const getCurrent = async (req, res) => {
     username,
   });
 };
+
+const signout = async (req, res) => {
+  const { _id } = req.user;
+  await authServices.setToken(_id);
+
+  res.status(204).json({
+    message: "No Content!",
+  });
+};
+
+const validSubscriptionValues = ["starter", "pro", "business"];
+
+const updateSubscription = async (req, res, next) => {
+  const { _id } = req.user;
+  const { subscription } = req.body;
+
+  if (!validSubscriptionValues.includes(subscription)) {
+    return next(new HttpError(400, "Invalid subscription value"));
+  }
+
+  try {
+    const { error } = updateSubscriptionSchema.validate(req.body);
+    if (error) {
+      throw HttpError(400, error.message);
+    }
+    const updatedUser = await userServices.updateSubscriptionByFilter(
+      { _id },
+      { subscription }
+    );
+
+    res.json(updatedUser);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
   getCurrent: ctrlWrapper(getCurrent),
+  signout: ctrlWrapper(signout),
+  updateSubscription: ctrlWrapper(updateSubscription),
 };

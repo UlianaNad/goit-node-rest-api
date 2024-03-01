@@ -1,14 +1,9 @@
 import {
-  listContacts,
   getContactsListFilter,
-  getContactById,
   getContactByFilter,
   addContact,
-  updateContactById,
   updateContactByFilter,
-  removeContact,
   removeContactByFilter,
-  updateStatusContact,
   updateStatusContactByFilter,
   getAllUserContactsByFilter,
 } from "../services/contactsServices.js";
@@ -21,7 +16,7 @@ import {
 
 export const getAllContacts = async (req, res, next) => {
   const { _id: owner } = req.user;
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 20 } = req.query;
   const skip = (page - 1) * limit;
   try {
     const result = await getContactsListFilter({ owner }, { skip, limit });

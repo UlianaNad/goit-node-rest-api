@@ -7,7 +7,6 @@ import "dotenv/config.js";
 import contactsRouter from "./routes/contactsRouter.js";
 import authRouter from "./routes/authRouter.js";
 
-// dotenv.config();
 const app = express();
 
 app.use(morgan("tiny"));
