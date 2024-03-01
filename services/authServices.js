@@ -8,3 +8,6 @@ export const signup = async (data) => {
 
   return User.create({ ...data, password: hashPassword });
 };
+
+export const setToken = async (id, token = "") =>
+  User.findByIdAndUpdate(id, { token });
