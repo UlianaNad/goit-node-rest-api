@@ -1,7 +1,5 @@
-import User from "../models/User.js";
 import bcryptjs from "bcryptjs";
-
-export const findUser = (filter) => User.findOne(filter);
+import User from "../models/User.js";
 
 export const signup = async (data) => {
   const { password } = data;
