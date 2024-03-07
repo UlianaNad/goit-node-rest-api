@@ -21,9 +21,6 @@ const contactsSchema = new Schema({
     ref: "user",
     required: true,
   },
-  avatar: {
-    type: String,
-  },
 });
 
 contactsSchema.post("save", handleSaveError);

@@ -13,10 +13,6 @@ import {
   updateContactSchema,
   updateContactStatusSchema,
 } from "../schemas/contactsSchemas.js";
-import fs from "fs/promises";
-import path from "path";
-
-const contactDir = path.resolve("public", "avatars");
 
 export const getAllContacts = async (req, res, next) => {
   const { _id: owner } = req.user;
@@ -63,19 +59,14 @@ export const deleteContact = async (req, res, next) => {
 };
 
 export const createContact = async (req, res, next) => {
-  const { path: oldPath, filename } = req.file;
-  const newPath = path.join(contactDir, filename);
-  console.log(oldPath);
-  console.log(newPath);
-  await fs.rename(oldPath, newPath);
   try {
     const { error } = createContactSchema.validate(req.body);
     if (error) {
       throw HttpError(400, error.message);
     }
     const { _id: owner } = req.user;
-    const avatar = path.join("avatars", filename);
-    const result = await addContact({ ...req.body, avatar, owner });
+
+    const result = await addContact({ ...req.body, owner });
 
     res.status(201).json(result);
   } catch (error) {
