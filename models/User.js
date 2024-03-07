@@ -29,6 +29,9 @@ const userSchema = new Schema(
       enum: ["starter", "pro", "business"],
       default: "starter",
     },
+    avatar: {
+      type: String,
+    },
   },
   { versionKey: false, timestamps: true }
 );

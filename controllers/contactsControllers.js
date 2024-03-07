@@ -59,13 +59,13 @@ export const deleteContact = async (req, res, next) => {
 };
 
 export const createContact = async (req, res, next) => {
-  const { _id: owner } = req.user;
-
   try {
     const { error } = createContactSchema.validate(req.body);
     if (error) {
       throw HttpError(400, error.message);
     }
+    const { _id: owner } = req.user;
+
     const result = await addContact({ ...req.body, owner });
 
     res.status(201).json(result);
