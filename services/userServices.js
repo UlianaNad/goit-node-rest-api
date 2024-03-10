@@ -6,3 +6,5 @@ export const findUserById = (id) => User.findById(id);
 
 export const updateSubscriptionByFilter = (filter, body) =>
   User.findOneAndUpdate(filter, body);
+
+export const updateUser = (filter, data) => User.findOneAndUpdate(filter, data);

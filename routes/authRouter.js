@@ -24,6 +24,8 @@ authRouter.post(
   authController.signin
 );
 
+authRouter.get("/verify/:verificationCode", authController.verify);
+
 authRouter.get("/users/current", authenticate, authController.getCurrent);
 
 authRouter.post("users/logout", authenticate, authController.signout);
