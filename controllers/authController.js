@@ -10,9 +10,26 @@ import gravatar from "gravatar";
 import fs from "fs/promises";
 import path from "path";
 import Jimp from "jimp";
+import ElasticEmail from "@elasticemail/elasticemail-client";
+import { nanoid } from "nanoid";
+
 const avatarsDir = path.resolve("public", "avatars");
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, ELASTICEMAIL_API_KEY, BASE_URL, ELASTICEMAIL_FROM } =
+  process.env;
+const defaultClient = ElasticEmail.ApiClient.instance;
+
+const { apikey } = defaultClient.authentications;
+apikey.apiKey = ELASTICEMAIL_API_KEY;
+const api = new ElasticEmail.EmailsApi();
+
+const callback = function (error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log("API called successfully.");
+  }
+};
 
 const signup = async (req, res) => {
   const { email } = req.body;
@@ -21,14 +38,30 @@ const signup = async (req, res) => {
   if (user) {
     throw HttpError(409, "Email is already in use!");
   }
-  // const { path: oldPath, filename } = req.file;
-  // const newPath = path.join(contactDir, filename);
 
-  // await fs.rename(oldPath, newPath);
-
-  //const avatar = path.join("avatars", filename);
+  const verificationCode = nanoid();
   const avatar = gravatar.url(email);
-  const newUser = await authServices.signup({ ...req.body, avatar });
+  const newUser = await authServices.signup({
+    ...req.body,
+    avatar,
+    verificationCode,
+  });
+
+  const emailToSend = ElasticEmail.EmailMessageData.constructFromObject({
+    Recipients: [new ElasticEmail.EmailRecipient("visaxep171@fashlend.com")],
+    Content: {
+      Body: [
+        ElasticEmail.BodyPart.constructFromObject({
+          ContentType: "HTML",
+          Content: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${verificationCode}">Click to verify email!</a> )`,
+        }),
+      ],
+      Subject: `Verify email`,
+      From: ELASTICEMAIL_FROM,
+    },
+  });
+
+  api.emailsPost(emailToSend, callback);
 
   res.status(201).json({
     username: newUser.username,
@@ -45,6 +78,10 @@ const signin = async (req, res) => {
   const passwordCompare = await bcryptjs.compare(password, user.password);
   if (!passwordCompare) {
     throw HttpError(401, "Password is invalid!");
+  }
+
+  if (!user.verify) {
+    throw HttpError(401, "Email is not verified!");
   }
 
   const payload = {
@@ -74,6 +111,20 @@ const signout = async (req, res) => {
   res.status(204).json({
     message: "No Content!",
   });
+};
+
+const verify = async (req, res) => {
+  const { verificationCode } = req.params;
+  const user = await userServices.findUser({ verificationCode });
+  if (!user) {
+    throw HttpError(404, "User is not found!");
+  }
+  await userServices.updateUser(
+    { _id: user._id },
+    { verify: true, verificationCode: "" }
+  );
+
+  res.json({ message: "Verification is successful!" });
 };
 
 const validSubscriptionValues = ["starter", "pro", "business"];
@@ -124,6 +175,7 @@ const updateAvatar = async (req, res, next) => {
 export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
+  verify: ctrlWrapper(verify),
   getCurrent: ctrlWrapper(getCurrent),
   signout: ctrlWrapper(signout),
   updateSubscription: ctrlWrapper(updateSubscription),
