@@ -127,6 +127,36 @@ const verify = async (req, res) => {
   res.json({ message: "Verification is successful!" });
 };
 
+const resendVerifyEmail = async (req, res) => {
+  const { email } = req.body;
+  const user = await userServices.findUser({ email });
+  if (!user) {
+    throw HttpError(404, "User was not found!");
+  }
+  if (user.verify) {
+    throw HttpError(400, "User was already verified!");
+  }
+
+  const emailToSend = ElasticEmail.EmailMessageData.constructFromObject({
+    Recipients: [new ElasticEmail.EmailRecipient(user.email)],
+    Content: {
+      Body: [
+        ElasticEmail.BodyPart.constructFromObject({
+          ContentType: "HTML",
+          Content: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${user.verificationCode}">Click to verify email!</a> )`,
+        }),
+      ],
+      Subject: `Verify email`,
+      From: ELASTICEMAIL_FROM,
+    },
+  });
+
+  api.emailsPost(emailToSend, callback);
+
+  res.json({
+    message: "Verification is successful!",
+  });
+};
 const validSubscriptionValues = ["starter", "pro", "business"];
 
 const updateSubscription = async (req, res, next) => {
@@ -176,6 +206,7 @@ export default {
   signup: ctrlWrapper(signup),
   signin: ctrlWrapper(signin),
   verify: ctrlWrapper(verify),
+  resendVerifyEmail: ctrlWrapper(resendVerifyEmail),
   getCurrent: ctrlWrapper(getCurrent),
   signout: ctrlWrapper(signout),
   updateSubscription: ctrlWrapper(updateSubscription),

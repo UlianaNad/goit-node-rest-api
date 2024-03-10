@@ -2,13 +2,17 @@ import express from "express";
 
 import validateBody from "../decorators/validateBody.js";
 
-import { signupSchema, signinSchema } from "../schemas/userSchema.js";
+import {
+  signupSchema,
+  signinSchema,
+  verifySchema,
+} from "../schemas/userSchema.js";
 
 import authController from "../controllers/authController.js";
 
 import authenticate from "../middlewares/authenticate.js";
 import upload from "../middlewares/upload.js";
-import Jimp from "jimp";
+
 const authRouter = express.Router();
 
 authRouter.post(
@@ -25,6 +29,12 @@ authRouter.post(
 );
 
 authRouter.get("/verify/:verificationCode", authController.verify);
+
+authRouter.post(
+  "/verify/",
+  validateBody(verifySchema),
+  authController.resendVerifyEmail
+);
 
 authRouter.get("/users/current", authenticate, authController.getCurrent);
 
